@@ -5,21 +5,21 @@ import RabbitOnMemory from '../src/index'
 
 describe('RabbitOnMemory topic mode', () => {
   it('should delivery a message to matched route and his queue', async () => {
-    const mockFn = jest.fn<any, any>((message: IMessage<unknown>) => {})
-    const mockFn2 = jest.fn<any, any>((message: IMessage<unknown>) => {})
-    const mockFn3 = jest.fn<any, any>((message: IMessage<unknown>) => {})
-    const mockFn4 = jest.fn<any, any>((message: IMessage<unknown>) => {})
-    const mockFn5 = jest.fn<any, any>((message: IMessage<unknown>) => {})
-    const mockFn6 = jest.fn<any, any>((message: IMessage<unknown>) => {})
+    const mockFn = jest.fn<any, any>((message: IMessage) => {})
+    const mockFn2 = jest.fn<any, any>((message: IMessage) => {})
+    const mockFn3 = jest.fn<any, any>((message: IMessage) => {})
+    const mockFn4 = jest.fn<any, any>((message: IMessage) => {})
+    const mockFn5 = jest.fn<any, any>((message: IMessage) => {})
+    const mockFn6 = jest.fn<any, any>((message: IMessage) => {})
 
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       exchange: 'topic',
       exchangeType: 'topic',
       queue: 'queue1',
       bindRoute: 'first.#',
       callback: mockFn
     }
-    const subOptions2: IQueueBinding<string> = {
+    const subOptions2: IQueueBinding = {
       exchange: 'topic',
       exchangeType: 'topic',
       queue: 'queue2',
@@ -27,7 +27,7 @@ describe('RabbitOnMemory topic mode', () => {
       callback: mockFn2
     }
 
-    const subOptions3: IQueueBinding<string> = {
+    const subOptions3: IQueueBinding = {
       exchange: 'topic',
       exchangeType: 'topic',
       queue: 'queue3',
@@ -35,7 +35,7 @@ describe('RabbitOnMemory topic mode', () => {
       callback: mockFn3
     }
 
-    const subOptions4: IQueueBinding<string> = {
+    const subOptions4: IQueueBinding = {
       exchange: 'topic',
       exchangeType: 'topic',
       queue: 'queue4',
@@ -43,7 +43,7 @@ describe('RabbitOnMemory topic mode', () => {
       callback: mockFn4
     }
 
-    const subOptions5: IQueueBinding<string> = {
+    const subOptions5: IQueueBinding = {
       exchange: 'topic',
       exchangeType: 'topic',
       queue: 'queue5',
@@ -51,7 +51,7 @@ describe('RabbitOnMemory topic mode', () => {
       callback: mockFn5
     }
 
-    const subOptions6: IQueueBinding<string> = {
+    const subOptions6: IQueueBinding = {
       exchange: 'topic',
       exchangeType: 'topic',
       queue: 'queue6',
@@ -97,21 +97,21 @@ describe('RabbitOnMemory topic mode', () => {
   })
 
   it('should delivery each message to his exchange', async () => {
-    const mockFn1 = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn1 = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
-    const mockFn2 = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn2 = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
     const route = 'same.route.all'
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       exchange: 'topic1',
       exchangeType: 'topic',
       queue: 'queue1',
       bindRoute: route,
       callback: mockFn1
     }
-    const subOptions2: IQueueBinding<string> = {
+    const subOptions2: IQueueBinding = {
       exchange: 'topic2',
       exchangeType: 'topic',
       queue: 'queue2',

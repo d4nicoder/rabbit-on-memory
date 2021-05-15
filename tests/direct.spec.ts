@@ -5,17 +5,17 @@ import RabbitOnMemory from '../src/index'
 
 describe('RabbitOnMemory direct mode', () => {
   it('should delivery a message to matched route and his queue', async () => {
-    const mockFn = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       exchange: 'direct',
       exchangeType: 'direct',
       queue: 'queue1',
       bindRoute: 'first.queue',
       callback: mockFn
     }
-    const subOptions2: IQueueBinding<string> = {
+    const subOptions2: IQueueBinding = {
       exchange: 'direct',
       exchangeType: 'direct',
       queue: 'second.queue',
@@ -38,21 +38,21 @@ describe('RabbitOnMemory direct mode', () => {
   })
 
   it('should delivery each message to his exchange', async () => {
-    const mockFn1 = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn1 = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
-    const mockFn2 = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn2 = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
     const route = 'same.route.all'
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       exchange: 'direct1',
       exchangeType: 'direct',
       queue: 'queue1',
       bindRoute: route,
       callback: mockFn1
     }
-    const subOptions2: IQueueBinding<string> = {
+    const subOptions2: IQueueBinding = {
       exchange: 'direct2',
       exchangeType: 'direct',
       queue: 'queue2',
