@@ -7,7 +7,7 @@ const publish = async (options: IPublishOptions): Promise<void> => {
   return rabbitInstance.publishRoute(options)
 }
 
-const subscribe = <T>(options: IQueueBinding<T>): void => {
+const subscribe = <T>(options: IQueueBinding): void => {
   const rabbitInstance = RabbitOnMemory.getInstance()
   rabbitInstance.bindQueue(options)
 }

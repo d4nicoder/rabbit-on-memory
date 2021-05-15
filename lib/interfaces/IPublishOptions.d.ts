@@ -1,7 +1,7 @@
 export interface IPublishOptions {
     exchange?: string;
     route: string;
-    content: unknown;
+    content: any;
     deliveryMode?: 1 | 2;
     headers?: {
         [key: string]: string;

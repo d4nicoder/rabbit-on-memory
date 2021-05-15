@@ -4,7 +4,7 @@ import RabbitOnMemory from '../src/index'
 
 describe('RabbitOnMemory direct mode', () => {
   it('should set exchange to default value', async () => {
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       queue: 'queue1',
       bindRoute: 'noMatter',
       callback: async () => {}
@@ -34,7 +34,7 @@ describe('RabbitOnMemory direct mode', () => {
   })
 
   it('should throw when exchange is not supported', async () => {
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       exchange: 'headers',
       exchangeType: 'headers',
       queue: 'queue1',
@@ -58,7 +58,7 @@ describe('RabbitOnMemory direct mode', () => {
 
   it ('should set delivery mode to 1', async () => {
     const mockFn = jest.fn<any, any>(async (message: any) => {})
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       queue: 'queue1',
       bindRoute: 'noMatter',
       callback: mockFn
@@ -75,14 +75,16 @@ describe('RabbitOnMemory direct mode', () => {
     await RabbitOnMemory.publish(messageOptions)
     expect(mockFn).toBeCalledWith(
       expect.objectContaining({
-        deliveryMode: 1
+        properties: expect.objectContaining({
+          deliveryMode: 1
+        })
       })
     )
   })
 
   it ('should set delivery mode to 2', async () => {
     const mockFn = jest.fn<any, any>(async (message: any) => {})
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       queue: 'queue1',
       bindRoute: 'noMatter',
       callback: mockFn
@@ -99,7 +101,9 @@ describe('RabbitOnMemory direct mode', () => {
     await RabbitOnMemory.publish(messageOptions)
     expect(mockFn).toBeCalledWith(
       expect.objectContaining({
-        deliveryMode: 2
+        properties: expect.objectContaining({
+          deliveryMode: 2
+        })
       })
     )
   })

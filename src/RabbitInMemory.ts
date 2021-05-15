@@ -2,13 +2,14 @@ import { IExchangeType, IQueueBinding } from "./interfaces/IQueueBinding"
 
 import { IMessage } from './interfaces/IMessage'
 import { IPublishOptions } from "./interfaces/IPublishOptions"
+import os from 'os'
 import { v4 } from 'uuid'
 
 export default class RabbitOnMemory {
   public static instance: RabbitOnMemory
 
   private readonly exchanges: Map<string, IExchangeType> = new Map()
-  private readonly routes: Map<string, IQueueBinding<any>[]> = new Map()
+  private readonly routes: Map<string, IQueueBinding[]> = new Map()
   private consumerTag: number = 1
 
   private constructor () { }
@@ -20,7 +21,7 @@ export default class RabbitOnMemory {
     this.exchanges.set(name, type)
   }
 
-  private async runQueues (list: IQueueBinding<any>[], message: IMessage<any>): Promise<void> {
+  private async runQueues (list: IQueueBinding[], message: IMessage): Promise<void> {
     for (let i = 0; i < list.length; i++) {
       try {
         await list[i].callback(message)
@@ -32,26 +33,26 @@ export default class RabbitOnMemory {
     }
   }
 
-  private async processQueuesFanout (message: IMessage<any>): Promise<void> {
-    const queues = Array.from(this.routes.values()).reduce((accum: IQueueBinding<any>[], queues: IQueueBinding<any>[]) => {
-      return accum.concat(queues.filter((queue) => queue.exchange === message.exchange))
+  private async processQueuesFanout (message: IMessage): Promise<void> {
+    const queues = Array.from(this.routes.values()).reduce((accum: IQueueBinding[], queues: IQueueBinding[]) => {
+      return accum.concat(queues.filter((queue) => queue.exchange === message.fields.exchange))
     }, [])
     return this.runQueues(queues, message)
   }
 
-  private async processQueuesDirect (route: string, message: IMessage<any>): Promise<void> {
-    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueBinding<any>[], queues: [string, IQueueBinding<any>[]]) => {
+  private async processQueuesDirect (route: string, message: IMessage): Promise<void> {
+    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueBinding[], queues: [string, IQueueBinding[]]) => {
       if (queues[0] === route) {
-        accum = accum.concat(queues[1].filter((queue) => queue.exchange === message.exchange))
+        accum = accum.concat(queues[1].filter((queue) => queue.exchange === message.fields.exchange))
       }
       return accum
     }, [])
     return this.runQueues(queues, message)
   }
 
-  private async processQueuesTopic (route: string, message: IMessage<any>): Promise<void> {
+  private async processQueuesTopic (route: string, message: IMessage): Promise<void> {
     const messageSplitedRoute: string[] = route.split('.')
-    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueBinding<any>[], queues: [string, IQueueBinding<any>[]]) => {
+    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueBinding[], queues: [string, IQueueBinding[]]) => {
       const queuesSplitedRoute: string[] = queues[0].split('.')
       for (let i = 0; i < messageSplitedRoute.length; i++) {
         if (messageSplitedRoute[i] === queuesSplitedRoute[i]) {
@@ -59,7 +60,7 @@ export default class RabbitOnMemory {
           continue
         } else if (queuesSplitedRoute[i] === '#') {
           // Match from here to end
-          return accum.concat(queues[1].filter((queue) => queue.exchange === message.exchange))
+          return accum.concat(queues[1].filter((queue) => queue.exchange === message.fields.exchange))
         } else if (queuesSplitedRoute[i] === '*') {
           // Match this segment
           continue
@@ -67,7 +68,7 @@ export default class RabbitOnMemory {
         // No match
         return accum
       }
-      return accum.concat(queues[1].filter((queue) => queue.exchange === message.exchange))
+      return accum.concat(queues[1].filter((queue) => queue.exchange === message.fields.exchange))
     }, [])
     return this.runQueues(queues, message)
   }
@@ -79,13 +80,13 @@ export default class RabbitOnMemory {
     return RabbitOnMemory.instance
   }
 
-  public bindQueue<T> (options: IQueueBinding<T>) {
+  public bindQueue<T> (options: IQueueBinding) {
     // Deine exchange
     options.exchange = options.exchange || 'default'
     options.exchangeType = options.exchangeType || 'direct'
     this.setExchange(options.exchange, options.exchangeType)
     
-    let queues: IQueueBinding<T>[] = this.routes.get(options.bindRoute) || []
+    let queues: IQueueBinding[] = this.routes.get(options.bindRoute) || []
     queues.push(options)
     this.routes.set(options.bindRoute, queues)
   }
@@ -106,23 +107,31 @@ export default class RabbitOnMemory {
     options.userId = options.userId || ''
     options.correlationId = options.correlationId || v4()
 
-    const message: IMessage<unknown> = {
-      appId: options.appId,
-      consumerTag: String(this.consumerTag++),
-      content: options.content,
-      contentEncoding: options.contentEncoding,
-      contentType: options.contentType,
-      correlationId: options.correlationId,
-      deliveryMode: options.deliveryMode,
-      exchange: options.exchange,
-      expiration: options.expiration,
-      headers: options.headers,
-      messageId: options.messageId,
-      replyTo: options.replyTo,
-      routingKey: options.route,
-      timestamp: options.timestamp,
-      type: options.type,
-      userId: options.type
+    const message: IMessage = {
+      fields: {
+        exchange: options.exchange,
+        routingKey: options.route,
+        redelivered: false,
+        consumerTag: String(this.consumerTag++),
+        deliveryTag: 1
+      },
+      properties: {
+        contentType: options.contentType,
+        contentEncoding: options.contentEncoding,
+        headers: options.headers,
+        deliveryMode: options.deliveryMode,
+        priority: 1,
+        correlationId: options.correlationId,
+        replyTo: options.replyTo,
+        expiration: options.expiration,
+        messageId: options.messageId,
+        timestamp: options.timestamp,
+        type: options.type,
+        userId: options.type,
+        appId: options.appId,
+        clusterId: os.hostname()
+      },
+      content: Buffer.from(options.content),
     }
 
     const exchangeType: IExchangeType | undefined = this.exchanges.get(options.exchange)

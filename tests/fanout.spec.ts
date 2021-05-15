@@ -5,17 +5,17 @@ import RabbitOnMemory from '../src/index'
 
 describe('RabbitOnMemory Fanout mode', () => {
   it('should delivery a message to all created queues', async () => {
-    const mockFn = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       exchange: 'fanout',
       exchangeType: 'fanout',
       queue: 'queue1',
       bindRoute: 'noMatter',
       callback: mockFn
     }
-    const subOptions2: IQueueBinding<string> = {
+    const subOptions2: IQueueBinding = {
       exchange: 'fanout',
       exchangeType: 'fanout',
       queue: 'queue2',
@@ -38,20 +38,20 @@ describe('RabbitOnMemory Fanout mode', () => {
   })
 
   it('should delivery each message to his exchange', async () => {
-    const mockFn = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
-    const mockFn2 = jest.fn<any, any>((message: IMessage<unknown>) => {
+    const mockFn2 = jest.fn<any, any>((message: IMessage) => {
       // Do nothing
     })
-    const subOptions: IQueueBinding<string> = {
+    const subOptions: IQueueBinding = {
       exchange: 'fanout1',
       exchangeType: 'fanout',
       queue: 'queue1',
       bindRoute: 'noMatter',
       callback: mockFn
     }
-    const subOptions2: IQueueBinding<string> = {
+    const subOptions2: IQueueBinding = {
       exchange: 'fanout2',
       exchangeType: 'fanout',
       queue: 'queue2',
