@@ -47,3 +47,8 @@ jobs:
           git push --tags
           git push
           echo ::set-output name=new_version::${NEW_VERSION}
+      
+      - name: Publish to NPM registry
+      - env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish
