@@ -49,6 +49,9 @@ jobs:
           echo ::set-output name=new_version::${NEW_VERSION}
       
       - name: Publish to NPM registry
-      - env:
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+        env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: npm publish
+        run: npm publish
