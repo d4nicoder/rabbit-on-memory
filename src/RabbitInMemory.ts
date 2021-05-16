@@ -1,5 +1,6 @@
 import { IExchangeType, IQueueBinding } from "./interfaces/IQueueBinding"
 
+import { IConfigOptions } from "./interfaces/IConfigOptions"
 import { IMessage } from './interfaces/IMessage'
 import { IPublishOptions } from "./interfaces/IPublishOptions"
 import os from 'os'
@@ -11,6 +12,10 @@ export default class RabbitOnMemory {
   private readonly exchanges: Map<string, IExchangeType> = new Map()
   private readonly routes: Map<string, IQueueBinding[]> = new Map()
   private consumerTag: number = 1
+  private configuration =  {
+    syncMode: true,
+    debug: false
+  }
 
   private constructor () { }
 
@@ -21,15 +26,42 @@ export default class RabbitOnMemory {
     this.exchanges.set(name, type)
   }
 
-  private async runQueues (list: IQueueBinding[], message: IMessage): Promise<void> {
+  private async runQueuesAsync (list: IQueueBinding[],  message: IMessage): Promise<void> {
+    for (let i = 0; i < list.length; i++) {
+      list[i].callback(message)
+        .then(() => {
+          if (this.configuration.debug) {
+            console.log(`Successful executed event on queue ${list[i].queue}, route ${list[i].bindRoute}`)
+          }
+        })
+        .catch((e) => {
+          console.error(e)
+          console.error(`Error executing the queue ${list[i].queue}`)
+          console.error(message)
+        })
+    }
+  }
+
+  private async runQueuesSync (list: IQueueBinding[], message: IMessage): Promise<void> {
     for (let i = 0; i < list.length; i++) {
       try {
         await list[i].callback(message)
+        if (this.configuration.debug) {
+          console.log(`Successful executed event on queue ${list[i].queue}, route ${list[i].bindRoute}`)
+        }
       } catch (e) {
         console.error(e)
         console.error(`Error executing the queue ${list[i].queue}`)
         console.error(message)
       }
+    }
+  }
+
+  private async runQueues (list: IQueueBinding[], message: IMessage): Promise<void> {
+    if (this.configuration.syncMode) {
+      return this.runQueuesSync(list, message)
+    } else {
+      return this.runQueuesAsync(list, message)
     }
   }
 
@@ -89,6 +121,14 @@ export default class RabbitOnMemory {
     let queues: IQueueBinding[] = this.routes.get(options.bindRoute) || []
     queues.push(options)
     this.routes.set(options.bindRoute, queues)
+    
+    if (this.configuration.debug) {
+      console.log(`New queue registered:`)
+      console.log(`  - Exchange:     ${options.exchange}`)
+      console.log(`  - ExchangeType: ${options.exchangeType}`)
+      console.log(`  - Queue:        ${options.queue}`)
+      console.log(`  - BindRoute:    ${options.bindRoute}`)
+    }
   }
 
   public async publishRoute (options: IPublishOptions) {
@@ -142,6 +182,11 @@ export default class RabbitOnMemory {
       error.name = 'ExchangeNotExists'
       throw error
     }
+
+    if (this.configuration.debug) {
+      console.log(`New event to send:`)
+      console.log(JSON.stringify(message, null, '  '))
+    }
     
     if (exchangeType === 'fanout') {
       return this.processQueuesFanout(message)
@@ -154,6 +199,18 @@ export default class RabbitOnMemory {
       error.message = `Exchange type ${exchangeType} not supported`
       error.name = 'ExchangeNotSupported'
       throw error
+    }
+  }
+
+  public setConfig (options: IConfigOptions) {
+    if (typeof options.syncMode === 'boolean') {
+      this.configuration.syncMode = options.syncMode
+      if (this.configuration.debug) {
+        console.log(`Events sync mode ${this.configuration.syncMode ? 'active' : 'disabled'}`)
+      }
+    }
+    if (typeof options.debug === 'boolean') {
+      this.configuration.debug = options.debug
     }
   }
 }

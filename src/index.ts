@@ -1,3 +1,4 @@
+import { IConfigOptions } from "./interfaces/IConfigOptions";
 import { IPublishOptions } from "./interfaces/IPublishOptions";
 import { IQueueBinding } from "./interfaces/IQueueBinding";
 import RabbitOnMemory from "./RabbitInMemory";
@@ -18,12 +19,22 @@ const publish = async (options: IPublishOptions): Promise<void> => {
  * queue not exists, it will be created in this moment
  * @param options Subscribing options
  */
-const subscribe = <T>(options: IQueueBinding): void => {
+const subscribe = (options: IQueueBinding): void => {
   const rabbitInstance = RabbitOnMemory.getInstance()
   rabbitInstance.bindQueue(options)
 }
 
+/**
+ * Configure behavior of the events
+ * @param options Options to configure behavior
+ */
+const setConfig = (options: IConfigOptions): void => {
+  const rabbitInstance = RabbitOnMemory.getInstance()
+  rabbitInstance.setConfig(options)
+}
+
 export default {
   publish,
-  subscribe
+  subscribe,
+  setConfig
 }
