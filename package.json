@@ -1,6 +1,6 @@
 {
   "name": "rabbit-on-memory",
-  "version": "0.16.0",
+  "version": "0.18.0",
   "description": "A RabbitMQ in memory implementation. Perfecto for testing and for implement DDD without external infrastructure",
   "main": "lib/index.js",
   "repository": "git@github.com:d4nicoder/rabbit-on-memory",
