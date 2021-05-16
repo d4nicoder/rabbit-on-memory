@@ -189,10 +189,19 @@ export default class RabbitOnMemory {
     }
     
     if (exchangeType === 'fanout') {
+      if (this.configuration.debug) {
+        console.log(`Publishing in fanout mode`)
+      }
       return this.processQueuesFanout(message)
     } else if (exchangeType === 'direct') {
+      if (this.configuration.debug) {
+        console.log(`Publishing in direct mode`)
+      }
       return this.processQueuesDirect(options.route, message)
     } else if (exchangeType === 'topic') {
+      if (this.configuration.debug) {
+        console.log(`Publishing in topic mode`)
+      }
       return this.processQueuesTopic(options.route, message)
     } else {
       const error = new Error()
