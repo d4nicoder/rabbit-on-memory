@@ -1,10 +1,22 @@
 # Rabbit on memory
 
+[![Tests](https://github.com/d4nicoder/rabbit-on-memory/actions/workflows/node.js.yml/badge.svg)](https://github.com/d4nicoder/rabbit-on-memory/actions/workflows/node.js.yml)
+
 This is a module to implement a basic RabbitMQ system on memory. It allows you to implement DDD in your NodeJS application without deploying extra infrastructure.
 
 With this module you can create exchanges, queues, bind this queues to his exchanges, publish and consume messages, etc. The allowed exchange types are: direct, topic and fanout. 
 
 All will be running in singleton mode, so you will not have to worrie about multiple instances of your message queues.
+
+## Installation
+
+```bash
+# NPM
+npm install --save rabbit-on-memory
+
+# Yarn
+yarn add rabbit-on-memory
+```
 
 ## Examples
 
