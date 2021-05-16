@@ -1,5 +1,5 @@
 export interface IPublishOptions {
-    exchange: string;
+    exchange?: string;
     route: string;
     content: any;
     deliveryMode?: 1 | 2;

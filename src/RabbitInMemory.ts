@@ -80,7 +80,7 @@ export default class RabbitOnMemory {
     return RabbitOnMemory.instance
   }
 
-  public bindQueue<T> (options: IQueueBinding) {
+  public bindQueue (options: IQueueBinding) {
     // Deine exchange
     options.exchange = options.exchange || 'default'
     options.exchangeType = options.exchangeType || 'direct'
