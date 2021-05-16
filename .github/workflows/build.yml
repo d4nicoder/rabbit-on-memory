@@ -43,7 +43,7 @@ jobs:
           if [ $LAST_COMMIT =~ "fix" ] || [ $LAST_COMMIT =~ "dependabot" ]; then TYPE=patch; else TYPE=minor; fi
           NEW_VERSION=$(npx push-version $TYPE)
           git commit -a -m "Updated to version: $NEW_VERSION"
-          git tag $NEW_VERSION
+          git tag -a $NEW_VERSION -m $NEW_VERSION
           git push --tags
           git push
           echo ::set-output name=new_version::${NEW_VERSION}
