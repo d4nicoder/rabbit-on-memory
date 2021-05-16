@@ -6,3 +6,5 @@ jest.config.ts
 tsconfig.json
 yarn*
 node_modules/*
+.DS_store
+settings.json
