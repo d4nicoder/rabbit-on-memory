@@ -1,8 +1,8 @@
-./src
-./tests
-./converage
-./jest.config.ts
-./.gitignore
-./tsconfig.json
-./yarn*
-./node_modules/*
+src/*
+tests/*
+coverage/*
+jest.config.ts
+.gitignore
+tsconfig.json
+yarn*
+node_modules/*
