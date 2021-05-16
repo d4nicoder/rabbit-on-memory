@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - "package.json"
+      - "CHANGELOG.md"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [15.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Setup github bot account
+        run: |
+          git config --global user.email "bot@github.com"
+          git config --global user.name "Github bot"
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn install
+      - run: yarn test
+      - run: yarn build
+
+      - name: Update package.json version
+        id: prep
+        env:
+          WORKDIR: ${{ github.workspace }}
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        run: |
+          cd $WORKDIR
+          LAST_COMMIT=$(git log -1 --pretty=%B)
+          if [ $LAST_COMMIT =~ "fix" ] || [ $LAST_COMMIT =~ "dependabot" ]; then TYPE=patch; else TYPE=minor; fi
+          NEW_VERSION=$(npx push-version $TYPE)
+          git commit -a -m "Updated to version: $NEW_VERSION"
+          git tag $NEW_VERSION
+          git push --tags
+          git push
+          echo ::set-output name=new_version::${NEW_VERSION}
