@@ -12,7 +12,7 @@ export default class RabbitOnMemory {
     private processQueuesDirect;
     private processQueuesTopic;
     static getInstance(): RabbitOnMemory;
-    bindQueue<T>(options: IQueueBinding): void;
+    bindQueue(options: IQueueBinding): void;
     publishRoute(options: IPublishOptions): Promise<void>;
 }
 //# sourceMappingURL=RabbitInMemory.d.ts.map
