@@ -56,6 +56,41 @@ describe('RabbitOnMemory direct mode', () => {
     })
   })
 
+  it('should remove expired queue', async () => {
+    const delay= async (): Promise<void> => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve()
+        }, 10)
+      })
+    }
+    const mockFn = jest.fn<any, any>(async (message: any) => {})
+    const subOptions: IQueueBinding = {
+      exchange: 'direct',
+      exchangeType: 'direct',
+      queue: 'queue1',
+      bindRoute: 'route',
+      options: {
+        expires: 1
+      },
+      callback: mockFn
+    }
+
+    RabbitOnMemory.subscribe(subOptions)
+
+    await delay()
+
+    const messageOptions: IPublishOptions = {
+      exchange: 'direct',
+      content: 'Sample message',
+      route: 'route',
+      deliveryMode: 1
+    }
+
+    await RabbitOnMemory.publish(messageOptions)
+    expect(mockFn).toHaveBeenCalledTimes(0)
+  })
+
   it ('should set delivery mode to 1', async () => {
     const mockFn = jest.fn<any, any>(async (message: any) => {})
     const subOptions: IQueueBinding = {
