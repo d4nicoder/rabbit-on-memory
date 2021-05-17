@@ -1,5 +1,7 @@
-import { IQueueBinding } from "./interfaces/IQueueBinding";
+/// <reference types="node" />
+import { IExchangeType, IQueueBinding } from "./interfaces/IQueueBinding";
 import { IConfigOptions } from "./interfaces/IConfigOptions";
+import { IMessage } from './interfaces/IMessage';
 import { IPublishOptions } from "./interfaces/IPublishOptions";
 export default class RabbitOnMemory {
     static instance: RabbitOnMemory;
@@ -20,8 +22,8 @@ export default class RabbitOnMemory {
      */
     private deleteExpired;
     static getInstance(): RabbitOnMemory;
-    bindQueue(options: IQueueBinding): void;
-    publishRoute(options: IPublishOptions): Promise<void>;
+    bindQueue(exchange: string, exchangeType: IExchangeType, queue: string, bindRoute: string, callback: (msg: IMessage) => Promise<void>, options?: IQueueBinding): void;
+    publishRoute(exchange: string, routingKey: string, content: Buffer, options?: IPublishOptions): Promise<void>;
     setConfig(options: IConfigOptions): void;
 }
 //# sourceMappingURL=RabbitInMemory.d.ts.map

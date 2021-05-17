@@ -1,75 +1,33 @@
-import { IMessage } from "../src/interfaces/IMessage"
-import { IPublishOptions } from "../src/interfaces/IPublishOptions"
-import { IQueueBinding } from "../src/interfaces/IQueueBinding"
 import RabbitOnMemory from '../src/index'
 
 describe('RabbitOnMemory direct mode', () => {
   it('should delivery a message to matched route and his queue', async () => {
-    const mockFn = jest.fn<any, any>((message: IMessage) => {
-      // Do nothing
-    })
-    const subOptions: IQueueBinding = {
-      exchange: 'direct',
-      exchangeType: 'direct',
-      queue: 'queue1',
-      bindRoute: 'first.queue',
-      callback: mockFn
-    }
-    const subOptions2: IQueueBinding = {
-      exchange: 'direct',
-      exchangeType: 'direct',
-      queue: 'second.queue',
-      bindRoute: 'noMatter2',
-      callback: mockFn
-    }
+    const mockFn = jest.fn<any, any>(() => {})
+    const exchange = 'direct'
 
-    RabbitOnMemory.subscribe(subOptions)
-    RabbitOnMemory.subscribe(subOptions2)
+    RabbitOnMemory.subscribe(exchange, 'direct', 'queue1', 'first.queue', mockFn)
+    RabbitOnMemory.subscribe(exchange, 'direct', 'queue2', 'second.queue', mockFn)
 
-    const messageOptions: IPublishOptions = {
-      exchange: 'direct',
-      content: 'Sample message',
-      route: 'first.queue'
-    }
+    const route = 'first.queue'
+    const content = Buffer.from('Sample message')
 
-    await RabbitOnMemory.publish(messageOptions)
+    await RabbitOnMemory.publish(exchange, route, content)
 
     expect(mockFn).toHaveBeenCalledTimes(1)
   })
 
   it('should delivery each message to his exchange', async () => {
-    const mockFn1 = jest.fn<any, any>((message: IMessage) => {
-      // Do nothing
-    })
-    const mockFn2 = jest.fn<any, any>((message: IMessage) => {
-      // Do nothing
-    })
+    const mockFn1 = jest.fn<any, any>(() => {})
+    const mockFn2 = jest.fn<any, any>(() => {})
     const route = 'same.route.all'
-    const subOptions: IQueueBinding = {
-      exchange: 'direct1',
-      exchangeType: 'direct',
-      queue: 'queue1',
-      bindRoute: route,
-      callback: mockFn1
-    }
-    const subOptions2: IQueueBinding = {
-      exchange: 'direct2',
-      exchangeType: 'direct',
-      queue: 'queue2',
-      bindRoute: route,
-      callback: mockFn2
-    }
+    const exchange = 'sample1'
 
-    RabbitOnMemory.subscribe(subOptions)
-    RabbitOnMemory.subscribe(subOptions2)
+    RabbitOnMemory.subscribe(exchange, 'direct', 'queue1', route, mockFn1)
+    RabbitOnMemory.subscribe('random', 'direct', 'queue2', route, mockFn2)
 
-    const messageOptions: IPublishOptions = {
-      exchange: 'direct1',
-      content: 'Sample message',
-      route
-    }
+    const content = Buffer.from('Sample message')
 
-    await RabbitOnMemory.publish(messageOptions)
+    await RabbitOnMemory.publish(exchange, route, content)
 
     expect(mockFn1).toHaveBeenCalledTimes(1)
     expect(mockFn2).toHaveBeenCalledTimes(0)

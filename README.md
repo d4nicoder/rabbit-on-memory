@@ -31,13 +31,7 @@ const bindRoute = 'core.user.1.event.user.created'
 const queue = 'send_email_on_created_user'
 const callback = async (msg) => {}
 
-RabbitOnMemory.subscribe({
-  exchange,
-  exchangeType,
-  bindRoute,
-  queue,
-  callback
-})
+RabbitOnMemory.subscribe(exchange, exchangeType, queue, bindRoute, callback})
 
 /* This will create the exchange if not exists and will
  * create the queue binded to the exchange with the provided
@@ -56,11 +50,7 @@ const msg = {
   content: Buffer.from(JSON.stringify(userData))
 }
 
-await RabbitOnMemory.publish({
-  exchange,
-  route,
-  content
-})
+await RabbitOnMemory.publish(exchange, route, content)
 
 /*
  * This will publish that content on the queue of that exchange
