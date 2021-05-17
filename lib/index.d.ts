@@ -1,9 +1,11 @@
+/// <reference types="node" />
+import { IExchangeType, IQueueBinding } from "./interfaces/IQueueBinding";
 import { IConfigOptions } from "./interfaces/IConfigOptions";
+import { IMessage } from "./interfaces/IMessage";
 import { IPublishOptions } from "./interfaces/IPublishOptions";
-import { IQueueBinding } from "./interfaces/IQueueBinding";
 declare const _default: {
-    publish: (options: IPublishOptions) => Promise<void>;
-    subscribe: (options: IQueueBinding) => void;
+    publish: (exchange: string, routingKey: string, content: Buffer, options?: IPublishOptions | undefined) => Promise<void>;
+    subscribe: (exchange: string, exchangeType: IExchangeType, queue: string, bindRoute: string, callback: (msg: IMessage) => Promise<void>, options?: IQueueBinding | undefined) => void;
     setConfig: (options: IConfigOptions) => void;
 };
 export default _default;

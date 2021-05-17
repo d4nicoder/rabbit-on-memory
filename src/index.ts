@@ -1,32 +1,44 @@
+import { IExchangeType, IQueueBinding } from "./interfaces/IQueueBinding";
+
 import { IConfigOptions } from "./interfaces/IConfigOptions";
+import { IMessage } from "./interfaces/IMessage";
 import { IPublishOptions } from "./interfaces/IPublishOptions";
-import { IQueueBinding } from "./interfaces/IQueueBinding";
-import RabbitOnMemory from "./RabbitInMemory";
+import RabbitOnMemory from "./RabbitOnMemory";
 
 /**
+ *
  * Publish a message in an exchange route. All the subscriber with valid binding keys
  * will be called with the payload.
- * @param options Publish options
- * @returns A promise when all the subscriber have ended
+ * @param {string} exchange
+ * @param {string} routingKey
+ * @param {Buffer} content
+ * @param {IPublishOptions} [options]
+ * @return {Promise<void>}
  */
-const publish = async (options: IPublishOptions): Promise<void> => {
+const publish = async (exchange: string, routingKey: string, content: Buffer, options?: IPublishOptions): Promise<void> => {
   const rabbitInstance = RabbitOnMemory.getInstance()
-  return rabbitInstance.publishRoute(options)
+  return rabbitInstance.publishRoute(exchange, routingKey, content, options)
 }
 
 /**
+ *
  * Creates a queue binded to a route in one exchange. It is lazy created, so if
  * queue not exists, it will be created in this moment
- * @param options Subscribing options
+ * @param {string} exchange
+ * @param {IExchangeType} exchangeType
+ * @param {string} queue
+ * @param {string} bindRoute
+ * @param {(msg: IMessage) => Promise<void>} callback
+ * @param {IQueueBinding} [options]
  */
-const subscribe = (options: IQueueBinding): void => {
+const subscribe = (exchange: string, exchangeType: IExchangeType, queue: string, bindRoute: string, callback: (msg: IMessage) => Promise<void>, options?: IQueueBinding): void => {
   const rabbitInstance = RabbitOnMemory.getInstance()
-  rabbitInstance.bindQueue(options)
+  rabbitInstance.bindQueue(exchange, exchangeType, queue, bindRoute, callback, options)
 }
 
 /**
  * Configure behavior of the events
- * @param options Options to configure behavior
+ * @param {IConfigOptions} options
  */
 const setConfig = (options: IConfigOptions): void => {
   const rabbitInstance = RabbitOnMemory.getInstance()

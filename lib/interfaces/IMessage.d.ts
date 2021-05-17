@@ -11,7 +11,7 @@ export interface IMessage {
         contentType?: string;
         contentEncoding?: string;
         headers: {
-            [key: string]: string;
+            [key: string]: any;
         };
         deliveryMode?: 1 | 2;
         priority?: number;
