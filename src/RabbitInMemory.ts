@@ -105,6 +105,25 @@ export default class RabbitOnMemory {
     return this.runQueues(queues, message)
   }
 
+  /**
+   * Delete expired queues
+   */
+  private deleteExpired (): void {
+    this.routes.forEach((queues, route) => {
+      const filtered = queues.filter((queue) => {
+        if (!queue.options || !queue.options.expires || !queue.options.expireTime) {
+          return true
+        }
+        return (Date.now() <= queue.options.expireTime)
+      })
+      if (filtered.length === 0) {
+        this.routes.delete(route)
+      } else {
+        this.routes.set(route, filtered)
+      }
+    })
+  }
+
   public static getInstance (): RabbitOnMemory {
     if (!RabbitOnMemory.instance) {
       RabbitOnMemory.instance = new RabbitOnMemory()
@@ -116,6 +135,9 @@ export default class RabbitOnMemory {
     // Define exchange
     options.exchange = options.exchange || 'default'
     options.exchangeType = options.exchangeType || 'direct'
+    if (options.options && options.options.expires) {
+      options.options.expireTime = Date.now() + options.options.expires
+    }
     this.setExchange(options.exchange, options.exchangeType)
     
     let queues: IQueueBinding[] = this.routes.get(options.bindRoute) || []
@@ -132,6 +154,9 @@ export default class RabbitOnMemory {
   }
 
   public async publishRoute (options: IPublishOptions) {
+    // Delete expired queues
+    this.deleteExpired()
+
     options.exchange = options.exchange || 'default'
 
     options.appId = options.appId || 'default'
@@ -192,17 +217,17 @@ export default class RabbitOnMemory {
       if (this.configuration.debug) {
         console.log(`Publishing in fanout mode`)
       }
-      return this.processQueuesFanout(message)
+      await this.processQueuesFanout(message)
     } else if (exchangeType === 'direct') {
       if (this.configuration.debug) {
         console.log(`Publishing in direct mode`)
       }
-      return this.processQueuesDirect(options.route, message)
+      await this.processQueuesDirect(options.route, message)
     } else if (exchangeType === 'topic') {
       if (this.configuration.debug) {
         console.log(`Publishing in topic mode`)
       }
-      return this.processQueuesTopic(options.route, message)
+      await this.processQueuesTopic(options.route, message)
     } else {
       const error = new Error()
       error.message = `Exchange type ${exchangeType} not supported`
