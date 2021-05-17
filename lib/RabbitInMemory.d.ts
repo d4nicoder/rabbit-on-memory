@@ -15,6 +15,10 @@ export default class RabbitOnMemory {
     private processQueuesFanout;
     private processQueuesDirect;
     private processQueuesTopic;
+    /**
+     * Delete expired queues
+     */
+    private deleteExpired;
     static getInstance(): RabbitOnMemory;
     bindQueue(options: IQueueBinding): void;
     publishRoute(options: IPublishOptions): Promise<void>;

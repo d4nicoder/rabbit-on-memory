@@ -5,6 +5,9 @@ export interface IQueueBinding {
     exchangeType?: IExchangeType;
     queue: string;
     bindRoute: string;
+    options?: {
+        [key: string]: any;
+    };
     callback: (message: IMessage) => Promise<void>;
 }
 //# sourceMappingURL=IQueueBinding.d.ts.map
