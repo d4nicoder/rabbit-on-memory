@@ -40,7 +40,7 @@ jobs:
         run: |
           cd $WORKDIR
           LAST_COMMIT=$(git log -1 --pretty=%B)
-          if [ $LAST_COMMIT =~ "fix" ] || [ $LAST_COMMIT =~ "dependabot" ]; then TYPE=patch; else TYPE=minor; fi
+          if [[ $LAST_COMMIT =~ "fix" || $LAST_COMMIT =~ "dependabot" ]]; then TYPE=patch; else TYPE=minor; fi
           NEW_VERSION=$(npx push-version $TYPE)
           git commit -a -m "Updated to version: $NEW_VERSION"
           git tag -a $NEW_VERSION -m $NEW_VERSION
