@@ -1,4 +1,4 @@
-import { IExchangeType, IQueueBinding } from "./interfaces/IQueueBinding"
+import { IExchangeType, IQueueBinding, IQueueInternal } from "./interfaces/IQueueBinding"
 
 import { IConfigOptions } from "./interfaces/IConfigOptions"
 import { IMessage } from './interfaces/IMessage'
@@ -10,7 +10,7 @@ export default class RabbitOnMemory {
   public static instance: RabbitOnMemory
 
   private readonly exchanges: Map<string, IExchangeType> = new Map()
-  private readonly routes: Map<string, IQueueBinding[]> = new Map()
+  private readonly routes: Map<string, IQueueInternal[]> = new Map()
   private consumerTag: number = 1
   private configuration =  {
     syncMode: true,
@@ -26,7 +26,7 @@ export default class RabbitOnMemory {
     this.exchanges.set(name, type)
   }
 
-  private async runQueuesAsync (list: IQueueBinding[],  message: IMessage): Promise<void> {
+  private async runQueuesAsync (list: IQueueInternal[],  message: IMessage): Promise<void> {
     for (let i = 0; i < list.length; i++) {
       const messageCopy = {...message}
       list[i].callback(messageCopy)
@@ -43,7 +43,7 @@ export default class RabbitOnMemory {
     }
   }
 
-  private async runQueuesSync (list: IQueueBinding[], message: IMessage): Promise<void> {
+  private async runQueuesSync (list: IQueueInternal[], message: IMessage): Promise<void> {
     for (let i = 0; i < list.length; i++) {
       try {
         await list[i].callback(message)
@@ -58,7 +58,7 @@ export default class RabbitOnMemory {
     }
   }
 
-  private async runQueues (list: IQueueBinding[], message: IMessage): Promise<void> {
+  private async runQueues (list: IQueueInternal[], message: IMessage): Promise<void> {
     if (this.configuration.syncMode) {
       return this.runQueuesSync(list, message)
     } else {
@@ -67,14 +67,14 @@ export default class RabbitOnMemory {
   }
 
   private async processQueuesFanout (message: IMessage): Promise<void> {
-    const queues = Array.from(this.routes.values()).reduce((accum: IQueueBinding[], queues: IQueueBinding[]) => {
+    const queues = Array.from(this.routes.values()).reduce((accum: IQueueInternal[], queues: IQueueInternal[]) => {
       return accum.concat(queues.filter((queue) => queue.exchange === message.fields.exchange))
     }, [])
     return this.runQueues(queues, message)
   }
 
   private async processQueuesDirect (route: string, message: IMessage): Promise<void> {
-    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueBinding[], queues: [string, IQueueBinding[]]) => {
+    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueInternal[], queues: [string, IQueueInternal[]]) => {
       if (queues[0] === route) {
         accum = accum.concat(queues[1].filter((queue) => queue.exchange === message.fields.exchange))
       }
@@ -85,7 +85,7 @@ export default class RabbitOnMemory {
 
   private async processQueuesTopic (route: string, message: IMessage): Promise<void> {
     const messageSplitedRoute: string[] = route.split('.')
-    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueBinding[], queues: [string, IQueueBinding[]]) => {
+    const queues = Array.from(this.routes.entries()).reduce((accum: IQueueInternal[], queues: [string, IQueueInternal[]]) => {
       const queuesSplitedRoute: string[] = queues[0].split('.')
       for (let i = 0; i < messageSplitedRoute.length; i++) {
         if (messageSplitedRoute[i] === queuesSplitedRoute[i]) {
@@ -132,51 +132,46 @@ export default class RabbitOnMemory {
     return RabbitOnMemory.instance
   }
 
-  public bindQueue (options: IQueueBinding) {
+  public bindQueue (exchange: string, exchangeType: IExchangeType, queue: string, bindRoute: string, callback: (msg: IMessage) => Promise<void>, options?: IQueueBinding) {
     // Define exchange
-    options.exchange = options.exchange || 'default'
-    options.exchangeType = options.exchangeType || 'direct'
-    if (options.options && options.options.expires) {
-      options.options.expireTime = Date.now() + options.options.expires
+    if (options && options.expires) {
+      options.expireTime = Date.now() + options.expires
     }
-    this.setExchange(options.exchange, options.exchangeType)
+    this.setExchange(exchange, exchangeType)
+
+    const internalQueue: IQueueInternal = {
+      exchange,
+      exchangeType,
+      bindRoute,
+      queue,
+      callback,
+      options
+    }
     
-    let queues: IQueueBinding[] = this.routes.get(options.bindRoute) || []
-    queues.push(options)
-    this.routes.set(options.bindRoute, queues)
+    let queues: IQueueInternal[] = this.routes.get(bindRoute) || []
+    queues.push(internalQueue)
+    this.routes.set(bindRoute, queues)
     
     if (this.configuration.debug) {
       console.log(`New queue registered:`)
-      console.log(`  - Exchange:     ${options.exchange}`)
-      console.log(`  - ExchangeType: ${options.exchangeType}`)
-      console.log(`  - Queue:        ${options.queue}`)
-      console.log(`  - BindRoute:    ${options.bindRoute}`)
+      console.log(`  - Exchange:     ${exchange}`)
+      console.log(`  - ExchangeType: ${exchangeType}`)
+      console.log(`  - Queue:        ${queue}`)
+      console.log(`  - BindRoute:    ${bindRoute}`)
     }
   }
 
-  public async publishRoute (options: IPublishOptions) {
+  public async publishRoute (exchange: string, routingKey: string, content: Buffer, options?: IPublishOptions) {
     // Delete expired queues
     this.deleteExpired()
 
-    options.exchange = options.exchange || 'default'
-
-    options.appId = options.appId || 'default'
-    options.contentEncoding = options.contentEncoding || 'none'
-    options.contentType = options.contentType || 'application/json'
-    options.deliveryMode = options.deliveryMode === 1 || options.deliveryMode === 2 ? options.deliveryMode : 1
-    options.expiration = options.expiration || new Date().toISOString()
-    options.headers = options.headers || {}
-    options.messageId = options.messageId || v4()
-    options.replyTo = options.replyTo || ''
-    options.timestamp = Math.floor(Date.now() / 1000)
-    options.type = options.type || ''
-    options.userId = options.userId || ''
-    options.correlationId = options.correlationId || v4()
+    exchange = exchange || 'default'
+    options = options || {}
 
     const message: IMessage = {
       fields: {
-        exchange: options.exchange,
-        routingKey: options.route,
+        exchange: exchange,
+        routingKey: routingKey,
         redelivered: false,
         consumerTag: String(this.consumerTag++),
         deliveryTag: 1
@@ -184,7 +179,7 @@ export default class RabbitOnMemory {
       properties: {
         contentType: options.contentType,
         contentEncoding: options.contentEncoding,
-        headers: options.headers,
+        headers: options.headers || {},
         deliveryMode: options.deliveryMode,
         priority: 1,
         correlationId: options.correlationId,
@@ -197,14 +192,14 @@ export default class RabbitOnMemory {
         appId: options.appId,
         clusterId: os.hostname()
       },
-      content: Buffer.from(options.content),
+      content: content,
     }
 
-    const exchangeType: IExchangeType | undefined = this.exchanges.get(options.exchange)
+    const exchangeType: IExchangeType | undefined = this.exchanges.get(exchange)
 
     if (!exchangeType) {
       const error = new Error()
-      error.message = `Exchange ${options.exchange} not exists`
+      error.message = `Exchange ${exchange} not exists`
       error.name = 'ExchangeNotExists'
       throw error
     }
@@ -223,12 +218,12 @@ export default class RabbitOnMemory {
       if (this.configuration.debug) {
         console.log(`Publishing in direct mode`)
       }
-      await this.processQueuesDirect(options.route, message)
+      await this.processQueuesDirect(routingKey, message)
     } else if (exchangeType === 'topic') {
       if (this.configuration.debug) {
         console.log(`Publishing in topic mode`)
       }
-      await this.processQueuesTopic(options.route, message)
+      await this.processQueuesTopic(routingKey, message)
     } else {
       const error = new Error()
       error.message = `Exchange type ${exchangeType} not supported`

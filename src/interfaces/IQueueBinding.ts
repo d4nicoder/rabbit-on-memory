@@ -1,14 +1,15 @@
 import { IMessage } from "./IMessage";
 
-export type IExchangeType = 'direct' | 'topic' | 'headers' | 'fanout'
+export type IExchangeType = 'direct' | 'topic' | 'fanout'
 
 export interface IQueueBinding {
-  exchange?: string
-  exchangeType?: IExchangeType
-  queue: string
+  [key: string]: any
+}
+
+export interface IQueueInternal extends IQueueBinding{
+  exchange: string
+  exchangeType: string
   bindRoute: string
-  options?: {
-    [key: string]: any
-  }
-  callback: (message: IMessage) => Promise<void>
+  queue: string
+  callback: (msg: IMessage) => Promise<void>
 }
