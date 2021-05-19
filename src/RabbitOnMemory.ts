@@ -28,7 +28,8 @@ export default class RabbitOnMemory {
 
   private async runQueuesAsync (list: IQueueInternal[],  message: IMessage): Promise<void> {
     for (let i = 0; i < list.length; i++) {
-      list[i].callback(message)
+      const messageCopy = {...message}
+      list[i].callback(messageCopy)
         .then(() => {
           if (this.configuration.debug) {
             console.log(`Successful executed event on queue ${list[i].queue}, route ${list[i].bindRoute}`)
