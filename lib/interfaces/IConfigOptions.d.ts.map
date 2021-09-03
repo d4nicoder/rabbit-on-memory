@@ -1,1 +1,1 @@
-{"version":3,"file":"IConfigOptions.d.ts","sourceRoot":"","sources":["../../src/interfaces/IConfigOptions.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,cAAc;IAC7B,QAAQ,CAAC,EAAE,OAAO,CAAA;IAClB,KAAK,CAAC,EAAE,OAAO,CAAA;CAChB"}
+{"version":3,"file":"IConfigOptions.d.ts","sourceRoot":"","sources":["../../src/interfaces/IConfigOptions.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,cAAc;IAC7B,QAAQ,CAAC,EAAE,OAAO,CAAA;IAClB,6BAA6B,CAAC,EAAE,OAAO,CAAA;IACvC,KAAK,CAAC,EAAE,OAAO,CAAA;CAChB"}
