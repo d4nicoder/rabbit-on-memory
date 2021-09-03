@@ -109,6 +109,7 @@ describe('RabbitOnMemory topic mode', () => {
     const callback2 = mockFn2
 
 
+    RabbitOnMemory.setConfig({propagateExceptionsOnSyncMode: false})
     RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
     RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
 
@@ -123,24 +124,23 @@ describe('RabbitOnMemory topic mode', () => {
     const mockFn2 = jest.fn<any, any>(() => {})
     const route = 'same.route.all'
 
-    const exchange1 = 'topic1'
+    const exchange1 = 'topic10'
     const exchangeType1 = 'topic'
-    const queue1 = 'queue1'
+    const queue1 = 'queue10'
     const bindRoute1 = route
     const callback1 = mockFn1
 
-    const exchange2 = 'topic1'
+    const exchange2 = 'topic10'
     const exchangeType2 = 'topic'
-    const queue2 = 'queue2'
+    const queue2 = 'queue20'
     const bindRoute2 = route
     const callback2 = mockFn2
 
     RabbitOnMemory.setConfig({syncMode: true, propagateExceptionsOnSyncMode: true})
-
     RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
     RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
 
-    await expect(RabbitOnMemory.publish('topic1', route, Buffer.from('Sample message'))).rejects.toThrow('test')
+    await expect(RabbitOnMemory.publish('topic10', route, Buffer.from('Sample message'))).rejects.toThrow('test')
 
     expect(mockFn1).toHaveBeenCalledTimes(1)
     expect(mockFn2).toHaveBeenCalledTimes(0)
