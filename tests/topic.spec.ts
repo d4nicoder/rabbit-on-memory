@@ -90,4 +90,59 @@ describe('RabbitOnMemory topic mode', () => {
     expect(mockFn1).toHaveBeenCalledTimes(1)
     expect(mockFn2).toHaveBeenCalledTimes(0)
   })
+
+  it('should continue after a subscriber method throws an exception when executing in async mode', async () => {
+    const mockFn1 = jest.fn<any, any>(() => { throw new Error() })
+    const mockFn2 = jest.fn<any, any>(() => {})
+    const route = 'same.route.all'
+
+    const exchange1 = 'topic1'
+    const exchangeType1 = 'topic'
+    const queue1 = 'queue1'
+    const bindRoute1 = route
+    const callback1 = mockFn1
+
+    const exchange2 = 'topic1'
+    const exchangeType2 = 'topic'
+    const queue2 = 'queue2'
+    const bindRoute2 = route
+    const callback2 = mockFn2
+
+
+    RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
+    RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
+
+    await RabbitOnMemory.publish('topic1', route, Buffer.from('Sample message'))
+
+    expect(mockFn1).toHaveBeenCalledTimes(1)
+    expect(mockFn2).toHaveBeenCalledTimes(1)
+  })
+
+  it('should throw an error when a subscriber throws too and execution is in sync mode and propagation is activated', async () => {
+    const mockFn1 = jest.fn<any, any>(() => { throw new Error('test') })
+    const mockFn2 = jest.fn<any, any>(() => {})
+    const route = 'same.route.all'
+
+    const exchange1 = 'topic1'
+    const exchangeType1 = 'topic'
+    const queue1 = 'queue1'
+    const bindRoute1 = route
+    const callback1 = mockFn1
+
+    const exchange2 = 'topic1'
+    const exchangeType2 = 'topic'
+    const queue2 = 'queue2'
+    const bindRoute2 = route
+    const callback2 = mockFn2
+
+    RabbitOnMemory.setConfig({syncMode: true, propagateExceptionsOnSyncMode: true})
+
+    RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
+    RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
+
+    await expect(RabbitOnMemory.publish('topic1', route, Buffer.from('Sample message'))).rejects.toThrow('test')
+
+    expect(mockFn1).toHaveBeenCalledTimes(1)
+    expect(mockFn2).toHaveBeenCalledTimes(0)
+  })
 })
