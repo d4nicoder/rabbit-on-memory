@@ -8,7 +8,13 @@ With this module you can create exchanges, queues, bind this queues to his excha
 
 All will be running in singleton mode, so you will not have to worrie about multiple instances of your message queues.
 
-## Installation
+## Documentation
+
+1. [Installation](#installation)
+2. [Options](#options)
+3. [Quick examples](#quick-examples)
+
+### Installation
 
 ```bash
 # NPM
@@ -18,9 +24,33 @@ npm install --save rabbit-on-memory
 yarn add rabbit-on-memory
 ```
 
-## Examples
+### Options
 
-### Creating a queue and bind to a route on an exchange
+You can personalize some behaviours for this module using the method `setConfig()`.
+
+```typescript
+import RabbitOnMemory from 'rabbit-on-memory'
+
+// To run the subscribers methods in sync mode
+RabbitOnMemory.setConfig({
+    syncMode: true // default: false
+})
+
+// To propagate exceptions from subscribers and stop the
+// execution of the rest of them (only in sync mode)
+RabbitOnMemory.setConfig({
+    propagateExceptionsOnSyncMode: true // default: false
+})
+
+// To activate the debug mode
+RabbitOnMemory.setConfig({
+    debug: true // default: false
+})
+```
+
+### Quick examples
+
+#### Creating a queue and bind to a route on an exchange
 
 ```typescript
 import RabbitOnMemory from 'rabbit-on-memory'
@@ -39,7 +69,7 @@ RabbitOnMemory.subscribe(exchange, exchangeType, queue, bindRoute, callback})
 */
 ```
 
-### Publish message to a route and exchange
+#### Publish message to a route and exchange
 
 ```typescript
 import RabbitOnMemory from 'rabbit-on-memory'

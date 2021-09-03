@@ -4,7 +4,6 @@ import { IConfigOptions } from "./interfaces/IConfigOptions"
 import { IMessage } from './interfaces/IMessage'
 import { IPublishOptions } from "./interfaces/IPublishOptions"
 import os from 'os'
-import { v4 } from 'uuid'
 
 export default class RabbitOnMemory {
   public static instance: RabbitOnMemory
@@ -14,6 +13,7 @@ export default class RabbitOnMemory {
   private consumerTag: number = 1
   private configuration =  {
     syncMode: true,
+    propagateExceptionsOnSyncMode: false,
     debug: false
   }
 
@@ -50,9 +50,12 @@ export default class RabbitOnMemory {
           console.log(`Successful executed event on queue ${list[i].queue}, route ${list[i].bindRoute}`)
         }
       } catch (e) {
-        console.error(e)
-        console.error(`Error executing the queue ${list[i].queue}`)
-        console.error(message)
+        if (this.configuration.propagateExceptionsOnSyncMode) {
+          throw e
+        } else {
+          console.error(`Error executing the queue ${list[i].queue}`)
+          console.error(e)
+        }
       }
     }
   }
@@ -146,11 +149,11 @@ export default class RabbitOnMemory {
       callback,
       options
     }
-    
+
     let queues: IQueueInternal[] = this.routes.get(bindRoute) || []
     queues.push(internalQueue)
     this.routes.set(bindRoute, queues)
-    
+
     if (this.configuration.debug) {
       console.log(`New queue registered:`)
       console.log(`  - Exchange:     ${exchange}`)
@@ -207,7 +210,7 @@ export default class RabbitOnMemory {
       console.log(`New event to send:`)
       console.log(JSON.stringify(message, null, '  '))
     }
-    
+
     if (exchangeType === 'fanout') {
       if (this.configuration.debug) {
         console.log(`Publishing in fanout mode`)
@@ -240,6 +243,9 @@ export default class RabbitOnMemory {
     }
     if (typeof options.debug === 'boolean') {
       this.configuration.debug = options.debug
+    }
+    if (typeof options.propagateExceptionsOnSyncMode === 'boolean') {
+      this.configuration.propagateExceptionsOnSyncMode = options.propagateExceptionsOnSyncMode
     }
   }
 }
