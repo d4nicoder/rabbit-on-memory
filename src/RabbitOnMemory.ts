@@ -17,7 +17,7 @@ export default class RabbitOnMemory {
     debug: false
   }
 
-  private constructor () {
+  public constructor () {
     // Set default exchange
     this.exchanges.set('default', 'direct')
   }
@@ -135,6 +135,10 @@ export default class RabbitOnMemory {
       RabbitOnMemory.instance = new RabbitOnMemory()
     }
     return RabbitOnMemory.instance
+  }
+
+  public static init (): RabbitOnMemory {
+    return new RabbitOnMemory()
   }
 
   public bindQueue (exchange: string, exchangeType: IExchangeType, queue: string, bindRoute: string, callback: (msg: IMessage) => Promise<void>, options?: IQueueBinding) {
