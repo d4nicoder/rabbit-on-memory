@@ -11,8 +11,9 @@ All will be running in singleton mode, so you will not have to worrie about mult
 ## Documentation
 
 1. [Installation](#installation)
-2. [Options](#options)
-3. [Quick examples](#quick-examples)
+2. [Singleton v/s multiple instances](#singleton vs multiple instances)
+3. [Options](#options)
+4. [Quick examples](#quick-examples)
 
 ### Installation
 
@@ -23,6 +24,27 @@ npm install --save rabbit-on-memory
 # Yarn
 yarn add rabbit-on-memory
 ```
+
+### Singleton vs multiple instances
+
+You can run in singleton mode or multiple instances.
+
+```typescript
+// Singleton mode
+import RabbitOnMemory from 'rabbit-on-memory';
+
+// The imported object is a singleton instance. It allows you to call directly the methods:
+RabbitOnMemory.setConfig(/* ... */);
+RabbitOnMemory.publish(/* ... */);
+RabbitOnMemory.subscribe(/* ... */);
+
+// But if you want a new instance, you can do it:
+const eventBus = RabbitOnMemory.init()
+eventBus.setConfig(/* ... */);
+eventBus.publish(/* ... */);
+eventBus.subscribe(/* ... */);
+```
+
 
 ### Options
 

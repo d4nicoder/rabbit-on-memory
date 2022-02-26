@@ -4,6 +4,11 @@ import { IConfigOptions } from "./interfaces/IConfigOptions";
 import { IMessage } from "./interfaces/IMessage";
 import { IPublishOptions } from "./interfaces/IPublishOptions";
 import RabbitOnMemory from "./RabbitOnMemory";
+import { RabbitOnMemoryWrapper } from './RabbitOnMemoryWrapper'
+
+const init = () => {
+
+}
 
 /**
  *
@@ -48,5 +53,8 @@ const setConfig = (options: IConfigOptions): void => {
 export default {
   publish,
   subscribe,
-  setConfig
+  setConfig,
+  init: (): RabbitOnMemoryWrapper => {
+    return new RabbitOnMemoryWrapper()
+  }
 }
