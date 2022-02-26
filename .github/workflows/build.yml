@@ -37,6 +37,7 @@ jobs:
         env:
           WORKDIR: ${{ github.workspace }}
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          BEARER_GITHUB: ${{ secrets.BEARER }}
         run: |
           cd $WORKDIR
           LAST_COMMIT=$(git log -1 --pretty=%B)
