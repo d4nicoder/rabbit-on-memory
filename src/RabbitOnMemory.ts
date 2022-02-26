@@ -52,7 +52,7 @@ export default class RabbitOnMemory {
       } catch (e) {
         if (this.configuration.propagateExceptionsOnSyncMode) {
           throw e
-        } else {
+        } else if (this.configuration.debug) {
           console.error(`Error executing the queue ${list[i].queue}`)
           console.error(e)
         }
