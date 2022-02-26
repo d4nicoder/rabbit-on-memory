@@ -17,7 +17,10 @@ export default class RabbitOnMemory {
     debug: false
   }
 
-  private constructor () { }
+  private constructor () {
+    // Set default exchange
+    this.exchanges.set('default', 'direct')
+  }
 
   private setExchange (name: string, type: IExchangeType) {
     if (this.exchanges.has(name)) {
@@ -200,10 +203,10 @@ export default class RabbitOnMemory {
     const exchangeType: IExchangeType | undefined = this.exchanges.get(exchange)
 
     if (!exchangeType) {
-      const error = new Error()
-      error.message = `Exchange ${exchange} not exists`
-      error.name = 'ExchangeNotExists'
-      throw error
+      if (this.configuration.debug) {
+        console.error(`Exchange ${exchange} not exists, dropping message`)
+      }
+      return
     }
 
     if (this.configuration.debug) {
@@ -228,7 +231,7 @@ export default class RabbitOnMemory {
       await this.processQueuesTopic(routingKey, message)
     } else {
       const error = new Error()
-      error.message = `Exchange type ${exchangeType} not supported`
+      error.message = `Exchange type ${exchangeType} for ${exchange} not supported`
       error.name = 'ExchangeNotSupported'
       throw error
     }
