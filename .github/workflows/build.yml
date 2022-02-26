@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.BEARER }}
       
       - name: Setup github bot account
         run: |
@@ -37,8 +39,6 @@ jobs:
         env:
           WORKDIR: ${{ github.workspace }}
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-          BEARER_GITHUB: ${{ secrets.BEARER }}
-          GITHUB_TOKEN: ${{ secrets.BEARER }}
         run: |
           cd $WORKDIR
           LAST_COMMIT=$(git log -1 --pretty=%B)
