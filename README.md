@@ -4,14 +4,12 @@
 
 This is a module to implement a basic RabbitMQ system on memory. It allows you to implement DDD in your NodeJS application without deploying extra infrastructure.
 
-With this module you can create exchanges, queues, bind this queues to his exchanges, publish and consume messages, etc. The allowed exchange types are: direct, topic and fanout. 
-
-All will be running in singleton mode, so you will not have to worrie about multiple instances of your message queues.
+With this module you can create exchanges, queues, bind this queues to his exchanges, publish and consume messages, etc. The allowed exchange types are: direct, topic and fanout.
 
 ## Documentation
 
 1. [Installation](#installation)
-2. [Singleton v/s multiple instances](#singleton vs multiple instances)
+2. [Singleton v/s multiple instances](#singleton-vs-multiple-instances)
 3. [Options](#options)
 4. [Quick examples](#quick-examples)
 
