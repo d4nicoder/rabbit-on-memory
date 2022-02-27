@@ -6,10 +6,6 @@ import { IPublishOptions } from "./interfaces/IPublishOptions";
 import RabbitOnMemory from "./RabbitOnMemory";
 import { RabbitOnMemoryWrapper } from './RabbitOnMemoryWrapper'
 
-const init = () => {
-
-}
-
 /**
  *
  * Publish a message in an exchange route. All the subscriber with valid binding keys
