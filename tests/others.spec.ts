@@ -5,7 +5,7 @@ import RabbitOnMemory from '../src/index'
 describe('RabbitOnMemory direct mode', () => {
   it('should throw when exchange not exists', async () => {
     const exchange = 'randomDirect'
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
 
     return RabbitOnMemory.publish(exchange, 'noMatter', content).catch(error => {
       expect(error.name).toBe('ExchangeNotExists')
@@ -20,7 +20,7 @@ describe('RabbitOnMemory direct mode', () => {
 
     const exchange = 'headers'
     const route = 'noMatter'
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
 
     return RabbitOnMemory.publish(exchange, route, content).catch(error => {
       expect(error.name).toBe('ExchangeNotSupported')
@@ -49,7 +49,7 @@ describe('RabbitOnMemory direct mode', () => {
     await delay()
 
     const route = 'route'
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
 
     await RabbitOnMemory.publish(exchange, route, content)
     expect(mockFn).toHaveBeenCalledTimes(0)
@@ -65,11 +65,11 @@ describe('RabbitOnMemory direct mode', () => {
     RabbitOnMemory.subscribe(exchange, exchangeType, queue, bindRoute, mockFn)
 
     const route = 'noMatter'
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
     const options: IPublishOptions = {
       deliveryMode: 1
     }
-    
+
     await RabbitOnMemory.publish(exchange, route, content, options)
     expect(mockFn).toBeCalledWith(
       expect.objectContaining({
@@ -86,16 +86,16 @@ describe('RabbitOnMemory direct mode', () => {
     const exchangeType = 'direct'
     const queue = 'queue1'
     const bindRoute = 'noMatter'
-    
+
 
     RabbitOnMemory.subscribe(exchange, exchangeType, queue, bindRoute, mockFn)
 
     const route = 'noMatter'
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
     const options: IPublishOptions = {
       deliveryMode: 2
     }
-    
+
     await RabbitOnMemory.publish(exchange, route, content, options)
     expect(mockFn).toBeCalledWith(
       expect.objectContaining({

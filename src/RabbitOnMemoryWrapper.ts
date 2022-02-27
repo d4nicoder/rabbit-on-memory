@@ -21,7 +21,7 @@ export class RabbitOnMemoryWrapper {
      * @param {IPublishOptions} [options]
      * @return {Promise<void>}
      */
-    public async publish (exchange: string, routingKey: string, content: Buffer, options?: IPublishOptions): Promise<void> {
+    public async publish (exchange: string, routingKey: string, content: unknown, options?: IPublishOptions): Promise<void> {
         return this.instance.publishRoute(exchange, routingKey, content, options)
     }
 

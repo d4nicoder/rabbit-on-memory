@@ -10,7 +10,7 @@ describe('RabbitOnMemory multiple instances', () => {
     instance1.subscribe(exchange, 'direct', 'queue1', 'first.queue', mockFn)
 
     const route = 'first.queue'
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
 
     await instance2.publish(exchange, route, content)
     await RabbitOnMemory.publish(exchange, route, content)

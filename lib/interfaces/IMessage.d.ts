@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export interface IMessage {
     fields: {
         exchange: string;
@@ -25,6 +24,6 @@ export interface IMessage {
         appId?: string;
         clusterId?: string;
     };
-    content: Buffer;
+    content: unknown;
 }
 //# sourceMappingURL=IMessage.d.ts.map

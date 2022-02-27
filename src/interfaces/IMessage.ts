@@ -24,5 +24,5 @@ export interface IMessage {
     appId?: string
     clusterId?: string
   }
-  content: Buffer
+  content: unknown
 }

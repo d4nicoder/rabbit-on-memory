@@ -16,7 +16,7 @@ import { RabbitOnMemoryWrapper } from './RabbitOnMemoryWrapper'
  * @param {IPublishOptions} [options]
  * @return {Promise<void>}
  */
-const publish = async (exchange: string, routingKey: string, content: Buffer, options?: IPublishOptions): Promise<void> => {
+const publish = async (exchange: string, routingKey: string, content: unknown, options?: IPublishOptions): Promise<void> => {
   const rabbitInstance = RabbitOnMemory.getInstance()
   return rabbitInstance.publishRoute(exchange, routingKey, content, options)
 }

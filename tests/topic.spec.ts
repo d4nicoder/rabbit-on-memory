@@ -52,9 +52,9 @@ describe('RabbitOnMemory topic mode', () => {
     RabbitOnMemory.subscribe(exchange5, exchangeType5, queue5, bindRoute5, callback5)
     RabbitOnMemory.subscribe(exchange6, exchangeType6, queue6, bindRoute6, callback6)
 
-    await RabbitOnMemory.publish('topic', 'first.queue', Buffer.from('Sample message'))
-    await RabbitOnMemory.publish('topic', 'second.queue', Buffer.from('Sample message'))
-    await RabbitOnMemory.publish('topic', 'first.queue.message', Buffer.from('Sample message'))
+    await RabbitOnMemory.publish('topic', 'first.queue', 'Sample message')
+    await RabbitOnMemory.publish('topic', 'second.queue', 'Sample message')
+    await RabbitOnMemory.publish('topic', 'first.queue.message', 'Sample message')
 
     expect(mockFn).toHaveBeenCalledTimes(2)
     expect(mockFn2).toHaveBeenCalledTimes(2)
@@ -85,7 +85,7 @@ describe('RabbitOnMemory topic mode', () => {
     RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
     RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
 
-    await RabbitOnMemory.publish('topic1', route, Buffer.from('Sample message'))
+    await RabbitOnMemory.publish('topic1', route, 'Sample message')
 
     expect(mockFn1).toHaveBeenCalledTimes(1)
     expect(mockFn2).toHaveBeenCalledTimes(0)
@@ -113,7 +113,7 @@ describe('RabbitOnMemory topic mode', () => {
     RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
     RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
 
-    await RabbitOnMemory.publish('topic1', route, Buffer.from('Sample message'))
+    await RabbitOnMemory.publish('topic1', route, 'Sample message')
 
     expect(mockFn1).toHaveBeenCalledTimes(1)
     expect(mockFn2).toHaveBeenCalledTimes(1)
@@ -140,7 +140,7 @@ describe('RabbitOnMemory topic mode', () => {
     RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
     RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
 
-    await expect(RabbitOnMemory.publish('topic10', route, Buffer.from('Sample message'))).rejects.toThrow('test')
+    await expect(RabbitOnMemory.publish('topic10', route, 'Sample message')).rejects.toThrow('test')
 
     expect(mockFn1).toHaveBeenCalledTimes(1)
     expect(mockFn2).toHaveBeenCalledTimes(0)

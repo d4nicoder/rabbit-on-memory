@@ -170,7 +170,7 @@ export default class RabbitOnMemory {
     }
   }
 
-  public async publishRoute (exchange: string, routingKey: string, content: Buffer, options?: IPublishOptions) {
+  public async publishRoute (exchange: string, routingKey: string, content: unknown, options?: IPublishOptions) {
     // Delete expired queues
     this.deleteExpired()
 

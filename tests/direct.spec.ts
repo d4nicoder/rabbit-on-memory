@@ -9,7 +9,7 @@ describe('RabbitOnMemory direct mode', () => {
     RabbitOnMemory.subscribe(exchange, 'direct', 'queue2', 'second.queue', mockFn)
 
     const route = 'first.queue'
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
 
     await RabbitOnMemory.publish(exchange, route, content)
 
@@ -25,7 +25,7 @@ describe('RabbitOnMemory direct mode', () => {
     RabbitOnMemory.subscribe(exchange, 'direct', 'queue1', route, mockFn1)
     RabbitOnMemory.subscribe('random', 'direct', 'queue2', route, mockFn2)
 
-    const content = Buffer.from('Sample message')
+    const content = 'Sample message'
 
     await RabbitOnMemory.publish(exchange, route, content)
 
