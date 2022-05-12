@@ -41,6 +41,15 @@ export class RabbitOnMemoryWrapper {
     }
 
     /**
+     * Unsubscribe from a queue
+     * @param {string} exchange
+     * @param {string} queue
+     */
+    public unsubscribe (exchange: string, queue: string): void {
+        this.instance.unbindQueue(exchange, queue)
+    }
+
+    /**
      * Configure behavior of the events
      * @param {IConfigOptions} options
      */

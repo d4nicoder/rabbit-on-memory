@@ -170,6 +170,14 @@ export default class RabbitOnMemory {
     }
   }
 
+  public unbindQueue (exchange: string, queue: string): void {
+    // Locate queue inside routes
+    this.routes.forEach((queues, route) => {
+      const filtered = queues.filter((q) => q.queue !== queue && q.exchange !== exchange)
+      this.routes.set(route, filtered)
+    })
+  }
+
   public async publishRoute (exchange: string, routingKey: string, content: unknown, options?: IPublishOptions) {
     // Delete expired queues
     this.deleteExpired()

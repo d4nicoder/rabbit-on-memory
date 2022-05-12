@@ -38,6 +38,16 @@ const subscribe = (exchange: string, exchangeType: IExchangeType, queue: string,
 }
 
 /**
+ * Unsubscribe from a queue
+ * @param {string} exchange
+ * @param {string} queue
+ */
+const unsubscribe = (exchange: string, queue: string): void => {
+  const rabbitInstance = RabbitOnMemory.getInstance()
+  rabbitInstance.unbindQueue(exchange, queue)
+}
+
+/**
  * Configure behavior of the events
  * @param {IConfigOptions} options
  */
@@ -49,6 +59,7 @@ const setConfig = (options: IConfigOptions): void => {
 export default {
   publish,
   subscribe,
+  unsubscribe,
   setConfig,
   init: (): RabbitOnMemoryWrapper => {
     return new RabbitOnMemoryWrapper()

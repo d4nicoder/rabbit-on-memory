@@ -105,4 +105,30 @@ describe('RabbitOnMemory direct mode', () => {
       })
     )
   })
+
+  it('should unsubscribe a queue', async () => {
+    const mockFn = jest.fn(async () => {})
+
+    const exchange = 'default'
+    const exchangeType = 'direct'
+    const queue = 'queue1'
+    const bindRoute = 'noMatter'
+
+    RabbitOnMemory.subscribe(exchange, exchangeType, queue, bindRoute, mockFn)
+
+    const route = 'noMatter'
+    const content = 'Sample message'
+    const options: IPublishOptions = {
+      deliveryMode: 2
+    }
+
+    await RabbitOnMemory.publish(exchange, route, content, options)
+
+    RabbitOnMemory.unsubscribe(exchange, queue)
+
+    // Publish again, this should not call mockFn because we have unsubscribed this queue
+    await RabbitOnMemory.publish(exchange, route, content, options)
+
+    expect(mockFn).toHaveBeenCalledTimes(1)
+  })
 })
