@@ -173,7 +173,7 @@ export default class RabbitOnMemory {
   public unbindQueue (exchange: string, queue: string): void {
     // Locate queue inside routes
     this.routes.forEach((queues, route) => {
-      const filtered = queues.filter((q) => q.queue !== queue && q.exchange !== exchange)
+      const filtered = queues.filter((q) => q.queue !== queue || q.exchange !== exchange)
       this.routes.set(route, filtered)
     })
   }
