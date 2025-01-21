@@ -8,6 +8,7 @@ describe('RabbitOnMemory topic mode', () => {
     const mockFn4 = jest.fn<any, any>(() => {})
     const mockFn5 = jest.fn<any, any>(() => {})
     const mockFn6 = jest.fn<any, any>(() => {})
+    const mockFn7 = jest.fn<any, any>(() => {})
 
     const exchange1 = 'topic'
     const exchangeType1 = 'topic'
@@ -45,12 +46,19 @@ describe('RabbitOnMemory topic mode', () => {
     const bindRoute6 = 'first.queues'
     const callback6 = mockFn6
 
+    const exchange7 = 'topic'
+    const exchangeType7 = 'topic'
+    const queue7 = 'queue7'
+    const bindRoute7 = 'first.*.message'
+    const callback7 = mockFn7
+
     RabbitOnMemory.subscribe(exchange1, exchangeType1, queue1, bindRoute1, callback1)
     RabbitOnMemory.subscribe(exchange2, exchangeType2, queue2, bindRoute2, callback2)
     RabbitOnMemory.subscribe(exchange3, exchangeType3, queue3, bindRoute3, callback3)
     RabbitOnMemory.subscribe(exchange4, exchangeType4, queue4, bindRoute4, callback4)
     RabbitOnMemory.subscribe(exchange5, exchangeType5, queue5, bindRoute5, callback5)
     RabbitOnMemory.subscribe(exchange6, exchangeType6, queue6, bindRoute6, callback6)
+    RabbitOnMemory.subscribe(exchange7, exchangeType7, queue7, bindRoute7, callback7)
 
     await RabbitOnMemory.publish('topic', 'first.queue', 'Sample message')
     await RabbitOnMemory.publish('topic', 'second.queue', 'Sample message')
@@ -62,6 +70,7 @@ describe('RabbitOnMemory topic mode', () => {
     expect(mockFn4).toHaveBeenCalledTimes(1)
     expect(mockFn5).toHaveBeenCalledTimes(1)
     expect(mockFn6).toHaveBeenCalledTimes(0)
+    expect(mockFn7).toHaveBeenCalledTimes(2)
   })
 
   it('should delivery each message to his exchange', async () => {
