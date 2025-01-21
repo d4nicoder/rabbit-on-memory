@@ -1,6 +1,6 @@
 {
   "name": "rabbit-on-memory",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A RabbitMQ in memory implementation. Perfect for testing and for implement DDD without external infrastructure",
   "repository": "git@github.com:d4nicoder/rabbit-on-memory",
   "author": "Daniel Cañada García <d4nicoder@gmail.com>",
